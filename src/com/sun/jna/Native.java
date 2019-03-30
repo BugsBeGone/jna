@@ -223,11 +223,16 @@ public final class Native implements Version {
         if (Boolean.getBoolean("jna.protected")) {
             setProtected(true);
         }
-        MAX_ALIGNMENT = Platform.isSPARC() || Platform.isWindows()
-            || (Platform.isLinux() && (Platform.isARM() || Platform.isPPC() || Platform.isMIPS()))
-            || Platform.isAIX()
-            || Platform.isAndroid()
-            ? 8 : LONG_SIZE;
+        // Check for GNUC i386.  If not Windows, it must be GNUC.
+        if (!Platform.isWindows() && Platform.isIntel() && !Platform.is64Bit()) {
+            MAX_ALIGNMENT = 4;
+        } else {
+            MAX_ALIGNMENT = Platform.isSPARC() || Platform.isWindows()
+                || (Platform.isLinux() && (Platform.isARM() || Platform.isPPC() || Platform.isMIPS()))
+                || Platform.isAIX()
+                || Platform.isAndroid()
+                ? 8 : LONG_SIZE;
+        }
         MAX_PADDING = (Platform.isMac() && Platform.isPPC()) ? 8 : MAX_ALIGNMENT;
         System.setProperty("jna.loaded", "true");
     }
